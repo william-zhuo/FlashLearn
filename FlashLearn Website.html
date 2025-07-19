@@ -1,0 +1,1962 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlashLearn</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-tab {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            color: #666;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-tab:hover,
+        .nav-tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .main-content {
+            padding: 2rem 0;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .btn-flag {
+            background: #dc3545;
+            color: white;
+            border: none;
+        }
+
+        .btn-flag:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .btn-flag.flagged {
+            background: #e74c3c;
+            box-shadow: 0 0 10px rgba(231, 76, 60, 0.3);
+        }
+
+        .selection-controls {
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .flashcards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .flashcard-item {
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .flashcard-item:hover {
+            border-color: #667eea;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .flashcard-item.selected {
+            border-color: #667eea;
+            background: #f8f9ff;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .flashcard-item.flagged {
+            background: #fdf2f2;
+            border-color: #fca5a5;
+        }
+
+        .flashcard-item.flagged.selected {
+            background: #fef1f1;
+            border-color: #667eea;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .flashcard-selection {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 10;
+        }
+
+        .flashcard-selection input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .flashcard-content {
+            margin-bottom: 1rem;
+            padding-right: 40px;
+        }
+
+        .flashcard-front,
+        .flashcard-back {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+
+        .flashcard-front {
+            border-left: 4px solid #667eea;
+        }
+
+        .flashcard-back {
+            border-left: 4px solid #764ba2;
+        }
+
+        .flashcard-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .flashcard-actions .btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        .study-card {
+            background: white;
+            border-radius: 15px;
+            padding: 3rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .study-card:hover {
+            transform: scale(1.02);
+        }
+
+        .study-card.flipped {
+            background: #f8f9ff;
+            border: 2px solid #667eea;
+        }
+
+        .study-card.flagged {
+            background: #fdf2f2;
+            border: 2px solid #fca5a5;
+        }
+
+        .study-card.flagged.flipped {
+            background: #fef1f1;
+            border: 2px solid #667eea;
+        }
+
+        .study-info {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .study-text {
+            font-size: 1.5rem;
+            line-height: 1.6;
+            color: #333;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .study-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #666;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: #667eea;
+        }
+
+        .set-selector {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .set-selector select {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .set-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .flashcards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .study-card {
+                padding: 2rem;
+            }
+
+            .study-text {
+                font-size: 1.25rem;
+            }
+
+            .selection-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .set-selector {
+                flex-direction: column;
+            }
+
+            .set-actions {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">📚 FlashLearn</div>
+                <div class="nav-tabs">
+                    <button class="nav-tab active" onclick="showSection('manage')">Manage Flashcards</button>
+                    <button class="nav-tab" onclick="showSection('study')">Study Mode</button>
+                    <button class="nav-tab" onclick="showSection('pomodoro')">Pomodoro Timer</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="main-content">
+            <!-- Manage Flashcards Section -->
+            <div id="manage" class="section active">
+                <div class="card">
+                    <h2>Add New Flashcards</h2>
+                    <div class="form-group">
+                        <label for="flashcardText">Enter flashcards (one per line, format: "front;back")</label>
+                        <textarea id="flashcardText" class="form-control"
+                            placeholder="e.g. 'Which is the best baseball team of all time?;The Toronto Blue Jays'"></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="addFlashcards()">Add Flashcards</button>
+                </div>
+
+                <div class="card">
+                    <h2>Your Flashcards</h2>
+                    <div class="selection-controls">
+                        <button class="btn btn-secondary" onclick="toggleSelectAll()">Select All</button>
+                        <div class="set-selector">
+                            <select id="targetSetSelect" class="form-control">
+                                <option value="">Select existing set...</option>
+                            </select>
+                            <div class="set-actions">
+                                <button class="btn btn-primary" onclick="addToExistingSet()">Add to Set</button>
+                                <button class="btn btn-primary" onclick="createNewSet()">Create New Set</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="flashcardsContainer">
+                        <div class="loading">Loading flashcards...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Study Mode Section -->
+            <div id="study" class="section">
+                <div class="card">
+                    <h2>Study Options</h2>
+                    <div id="studyOptionsContainer">
+                        <div class="form-group">
+                            <label>Choose sets to study:</label>
+                            <div id="studyCheckboxes" style="margin-top: 1rem;">
+                                <!-- Checkboxes will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="startStudy()">Start Study Session</button>
+                        <button class="btn btn-flag" onclick="startFlaggedStudy()">Study Flagged Cards</button>
+                    </div>
+                    <div id="studySessionContainer" style="display: none;">
+                        <button class="btn btn-danger" onclick="abortStudy()">Abort Study Session</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div id="studyContainer">
+                        <div class="loading">Select study mode and click "Start Study Session"</div>
+                    </div>
+                </div>
+            </div>
+            <!-- Pomodoro Timer Section -->
+            <div id="pomodoro" class="section">
+                <div class="card">
+                    <h2>Pomodoro Timer</h2>
+                    <div id="pomodoroContainer">
+                        <div id="timerDisplay" style="text-align: center; margin: 2rem 0;">
+                            <div id="timerCircle"
+                                style="width: 200px; height: 200px; border: 8px solid #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem auto; position: relative; background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);">
+                                <div id="timerTime" style="font-size: 2.5rem; font-weight: bold; color: #667eea;">25:00</div>
+                                <div id="timerProgress"
+                                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; border: 8px solid transparent; border-top: 8px solid #764ba2; transform: rotate(-90deg); transition: transform 0.1s ease; box-sizing: border-box;">
+                                </div>
+                            </div>
+                            <div id="timerPhase" style="font-size: 1.2rem; color: #666; margin-bottom: 1rem; font-weight: 500;">Work
+                                Session</div>
+                        </div>
+            
+                        <div style="text-align: center; margin: 2rem 0;">
+                            <button id="startPauseBtn" class="btn btn-primary" onclick="toggleTimer()"
+                                style="margin: 0 0.5rem;">Start</button>
+                            <button id="resetBtn" class="btn btn-secondary" onclick="resetTimer()"
+                                style="margin: 0 0.5rem;">Reset</button>
+                            <button id="skipBtn" class="btn btn-secondary" onclick="skipSession()"
+                                style="margin: 0 0.5rem;">Skip</button>
+                        </div>
+            
+                        <div id="pomodoroSettings" style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #e1e5e9;">
+                            <h3 style="color: #667eea; margin-bottom: 1rem;">Settings</h3>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                                <div class="form-group">
+                                    <label for="workDuration">Work Duration (minutes):</label>
+                                    <input type="number" id="workDuration" class="form-control" value="25" min="1" max="60"
+                                        onchange="updateSettings()">
+                                </div>
+                                <div class="form-group">
+                                    <label for="shortBreakDuration">Short Break (minutes):</label>
+                                    <input type="number" id="shortBreakDuration" class="form-control" value="5" min="1" max="30"
+                                        onchange="updateSettings()">
+                                </div>
+                                <div class="form-group">
+                                    <label for="longBreakDuration">Long Break (minutes):</label>
+                                    <input type="number" id="longBreakDuration" class="form-control" value="15" min="1" max="60"
+                                        onchange="updateSettings()">
+                                </div>
+                                <div class="form-group">
+                                    <label for="sessionsBeforeLongBreak">Sessions before long break:</label>
+                                    <input type="number" id="sessionsBeforeLongBreak" class="form-control" value="4" min="2"
+                                        max="10" onchange="updateSettings()">
+                                </div>
+                            </div>
+                        </div>
+            
+                        <div id="pomodoroStats" style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #e1e5e9;">
+                            <h3 style="color: #667eea; margin-bottom: 1rem;">Today's Progress</h3>
+                            <div
+                                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; text-align: center;">
+                                <div style="background: #f8f9ff; padding: 1rem; border-radius: 8px; border: 2px solid #e1e5e9;">
+                                    <div style="font-size: 2rem; font-weight: bold; color: #667eea;" id="completedSessions">0</div>
+                                    <div style="color: #666; font-size: 0.9rem;">Work Sessions</div>
+                                </div>
+                                <div style="background: #f8f9ff; padding: 1rem; border-radius: 8px; border: 2px solid #e1e5e9;">
+                                    <div style="font-size: 2rem; font-weight: bold; color: #667eea;" id="totalFocusTime">0:00</div>
+                                    <div style="color: #666; font-size: 0.9rem;">Focus Time</div>
+                                </div>
+                                <div style="background: #f8f9ff; padding: 1rem; border-radius: 8px; border: 2px solid #e1e5e9;">
+                                    <div style="font-size: 2rem; font-weight: bold; color: #667eea;" id="currentStreak">0</div>
+                                    <div style="color: #666; font-size: 0.9rem;">Current Streak</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Minesweeper Section -->
+    <div id="minesweeper-section">
+        <div class="minesweeper-container">
+            <h2>🎮 Secret Minesweeper!</h2>
+            <p style="color: #666;">Press ESC to close</p>
+    
+            <div class="minesweeper-controls">
+                <button class="btn btn-primary" onclick="initMinesweeper()">New Game</button>
+                <select id="difficulty" onchange="initMinesweeper()">
+                    <option value="easy">Easy (9x9, 10 mines)</option>
+                    <option value="medium">Medium (16x16, 40 mines)</option>
+                    <option value="hard">Hard (16x30, 99 mines)</option>
+                </select>
+            </div>
+    
+            <div class="minesweeper-stats">
+                <div>Mines: <span id="mine-count">10</span></div>
+                <div>Time: <span id="game-time">0</span>s</div>
+                <div id="game-status">Click to start!</div>
+            </div>
+    
+            <div id="minesweeper-grid" class="minesweeper-grid"></div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditModal()">&times;</span>
+            <h2>Edit Flashcard</h2>
+            <div class="form-group">
+                <label for="editFront">Front:</label>
+                <textarea id="editFront" class="form-control"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="editBack">Back:</label>
+                <textarea id="editBack" class="form-control"></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="saveEdit()">Save Changes</button>
+            <button class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Create Set Modal -->
+    <div id="createSetModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeCreateSetModal()">&times;</span>
+            <h2>Create New Flashcard Set</h2>
+            <div class="form-group">
+                <label for="setName">Set Name:</label>
+                <input type="text" id="setName" class="form-control" placeholder="Enter set name">
+            </div>
+            <button class="btn btn-primary" onclick="confirmCreateSet()">Create Set</button>
+            <button class="btn btn-secondary" onclick="closeCreateSetModal()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8001';
+        let flashcards = [];
+        let flashcardSets = [];
+        let currentStudyIndex = 0;
+        let currentStudySet = [];
+        let isFlipped = false;
+        let selectedFlashcards = new Set();
+        let currentEditId = null;
+        let isStudySessionActive = false;
+        // Pomodoro timer variables
+        let pomodoroTimer = null;
+        let pomodoroTimeLeft = 25 * 60; // 25 minutes in seconds
+        let pomodoroIsRunning = false;
+        let pomodoroPhase = 'work'; // 'work', 'shortBreak', 'longBreak'
+        let pomodoroSessionCount = 0;
+        let pomodoroCompletedSessions = 0;
+        let pomodoroTotalFocusTime = 0; // in seconds
+        // Minesweeper variables
+        let minesweeperGrid = [];
+        let minesweeperRows = 9;
+        let minesweeperCols = 9;
+        let minesweeperMines = 10;
+        let minesweeperGameActive = false;
+        let minesweeperStartTime = null;
+        let minesweeperTimer = null;
+        let minesweeperFlagsUsed = 0;
+        let pomodoroSettings = {
+            work: 25 * 60,
+            shortBreak: 5 * 60,
+            longBreak: 15 * 60,
+            sessionsBeforeLongBreak: 4
+        };
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function () {
+            loadFlashcards();
+        });
+
+        // Helper: get set name by id
+        function getSetName(setId) {
+            const set = flashcardSets.find(s => s.id === setId);
+            return set ? set.name : 'Unknown Set';
+        }
+
+        // Navigation
+        function showSection(sectionName) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            document.getElementById(sectionName).classList.add('active');
+            document.querySelector(`[onclick="showSection('${sectionName}')"]`).classList.add('active');
+
+            if (sectionName === 'manage') {
+                loadFlashcards();
+            } else if (sectionName === 'study') {
+                loadStudyOptions();
+            } else if (sectionName === 'pomodoro') {
+                initializePomodoro();
+            }
+        }
+
+        // Show message to user
+        function showMessage(message, type) {
+            // Remove existing messages
+            document.querySelectorAll('.message').forEach(msg => msg.remove());
+
+            // Create new message
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = message;
+
+            // Insert at the top of the main content
+            const mainContent = document.querySelector('.main-content');
+            mainContent.insertBefore(messageDiv, mainContent.firstChild);
+
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+
+        // Add flashcards
+        async function addFlashcards() {
+            const text = document.getElementById('flashcardText').value.trim();
+
+            // Hidden minesweeper easter egg
+            if (text.toLowerCase() === 'minesweeper') {
+                document.getElementById('flashcardText').value = '';
+                showMinesweeper();
+                return;
+            }
+            if (!text) {
+                showMessage('Please enter some flashcards', 'error');
+                return;
+            }
+
+            try {
+                const url = new URL(`${API_BASE}/flashcards/create`);
+                url.searchParams.append('flashcard_text', text);
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (response.ok) {
+                    const newFlashcards = await response.json();
+                    showMessage(`Added ${newFlashcards.length} flashcards successfully!`, 'success');
+                    document.getElementById('flashcardText').value = '';
+                    await loadFlashcards();
+                } else {
+                    const error = await response.json();
+                    showMessage(`Error: ${error.detail}`, 'error');
+                    console.error('API Error:', error);
+                }
+            } catch (error) {
+                showMessage(`Error: ${error.message}`, 'error');
+                console.error('Network Error:', error);
+            }
+        }
+
+        // Load flashcards and sets together
+        async function loadFlashcards() {
+            try {
+                const [cardsRes, setsRes] = await Promise.all([
+                    fetch(`${API_BASE}/flashcards`),
+                    fetch(`${API_BASE}/flashcard-sets`)
+                ]);
+
+                if (cardsRes.ok && setsRes.ok) {
+                    flashcards = await cardsRes.json();
+                    flashcardSets = await setsRes.json();
+
+                    // Update set counts and clean up empty sets
+                    await updateSetCounts();
+
+                    displayFlashcards();
+                    updateTargetSetSelector();
+                } else {
+                    throw new Error('Failed to load flashcards or sets');
+                }
+            } catch (error) {
+                document.getElementById('flashcardsContainer').innerHTML =
+                    '<div class="message error">Error loading flashcards. Make sure the API is running.</div>';
+            }
+        }
+
+        // Update set counts and clean up empty sets
+        async function updateSetCounts() {
+            try {
+                // Calculate actual flashcard counts per set
+                const setCounts = {};
+                flashcards.forEach(card => {
+                    if (card.set_id && card.set_id !== 'none') {
+                        setCounts[card.set_id] = (setCounts[card.set_id] || 0) + 1;
+                    }
+                });
+
+                // Update sets with correct counts and identify empty sets
+                const emptySets = [];
+                const updatedSets = [];
+
+                for (const set of flashcardSets) {
+                    const actualCount = setCounts[set.id] || 0;
+
+                    if (actualCount === 0) {
+                        emptySets.push(set);
+                    } else {
+                        // Update set count if different
+                        if (set.flashcard_count !== actualCount) {
+                            try {
+                                const response = await fetch(`${API_BASE}/flashcard-sets/${set.id}`, {
+                                    method: 'PUT',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        name: set.name,
+                                        flashcard_count: actualCount
+                                    })
+                                });
+
+                                if (response.ok) {
+                                    set.flashcard_count = actualCount;
+                                }
+                            } catch (error) {
+                                console.warn('Failed to update set count for:', set.name);
+                            }
+                        }
+                        updatedSets.push(set);
+                    }
+                }
+
+                // Delete empty sets
+                for (const emptySet of emptySets) {
+                    try {
+                        await fetch(`${API_BASE}/flashcard-sets/${emptySet.id}`, {
+                            method: 'DELETE'
+                        });
+                        console.log('Deleted empty set:', emptySet.name);
+                    } catch (error) {
+                        console.warn('Failed to delete empty set:', emptySet.name);
+                    }
+                }
+
+                // Update the local sets array
+                flashcardSets = updatedSets;
+
+            } catch (error) {
+                console.error('Error updating set counts:', error);
+            }
+        }
+
+        // Update the target set selector
+        function updateTargetSetSelector() {
+            const selector = document.getElementById('targetSetSelect');
+            selector.innerHTML = '<option value="">Select existing set...</option>';
+
+            // Only show sets that exist and have cards
+            const validSets = flashcardSets.filter(set => set.flashcard_count > 0);
+            validSets.forEach(set => {
+                const option = document.createElement('option');
+                option.value = set.id;
+                option.textContent = `${set.name} (${set.flashcard_count} cards)`;
+                selector.appendChild(option);
+            });
+        }
+
+        // Display flashcards grouped by set
+        function displayFlashcards() {
+            const container = document.getElementById('flashcardsContainer');
+            if (flashcards.length === 0) {
+                container.innerHTML = '<div class="message">No flashcards yet. Add some above!</div>';
+                return;
+            }
+
+            // Group flashcards by set
+            const grouped = {};
+            flashcards.forEach(card => {
+                const setId = card.set_id || 'none';
+                if (!grouped[setId]) grouped[setId] = [];
+                grouped[setId].push(card);
+            });
+
+            // Sort sets: put 'none' first, then by set name
+            const setOrder = Object.keys(grouped).sort((a, b) => {
+                if (a === 'none') return -1;
+                if (b === 'none') return 1;
+                return getSetName(a).localeCompare(getSetName(b));
+            });
+
+            container.innerHTML = setOrder.map((setId, index) => `
+                ${index > 0 ? '<div style="border-top: 2px solid #667eea; margin: 2rem 0 1rem 0; opacity: 0.3;"></div>' : ''}
+                <div style="margin-bottom: 1.5rem;">
+                    ${setId !== 'none' ? `<div style="color: #667eea; font-weight: 600; font-size: 1.1rem; margin-bottom: 1rem; padding: 0.5rem 0; border-bottom: 1px solid #e1e5e9;">📁 ${getSetName(setId)} (${grouped[setId].length} cards)</div>` : '<div style="color: #888; font-weight: 500; font-size: 1rem; margin-bottom: 1rem;">📝 Unorganized Cards</div>'}
+                    <div class="flashcards-grid">
+                        ${grouped[setId].sort((a, b) => b.flagged - a.flagged).map(card => `
+                            <div class="flashcard-item ${selectedFlashcards.has(card.id) ? 'selected' : ''} ${card.flagged ? 'flagged' : ''}" 
+                                 onclick="toggleFlashcardSelection('${card.id}')"
+                                 style="cursor: pointer;">
+                                <div class="flashcard-selection">
+                                    <input type="checkbox" ${selectedFlashcards.has(card.id) ? 'checked' : ''} 
+                                           onclick="event.stopPropagation(); toggleFlashcardSelection('${card.id}')">
+                                </div>
+                                <div class="flashcard-content">
+                                    <div class="flashcard-front">Q: ${card.front}</div>
+                                    <div class="flashcard-back">A: ${card.back}</div>
+                                </div>
+                                <div class="flashcard-actions">
+                                    <button class="btn btn-flag ${card.flagged ? 'flagged' : ''}" onclick="event.stopPropagation(); toggleFlag('${card.id}')">${card.flagged ? '🚩 Unflag' : '🚩 Flag'}</button>
+                                    <button class="btn btn-secondary" onclick="event.stopPropagation(); editFlashcard('${card.id}')">Edit</button>
+                                    <button class="btn btn-danger" onclick="event.stopPropagation(); deleteFlashcard('${card.id}')">Delete</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Selection functions
+        function toggleFlashcardSelection(id) {
+            if (selectedFlashcards.has(id)) {
+                selectedFlashcards.delete(id);
+            } else {
+                selectedFlashcards.add(id);
+            }
+            displayFlashcards();
+        }
+
+        function toggleSelectAll() {
+            if (selectedFlashcards.size === flashcards.length) {
+                selectedFlashcards.clear();
+            } else {
+                selectedFlashcards.clear();
+                flashcards.forEach(card => selectedFlashcards.add(card.id));
+            }
+            displayFlashcards();
+        }
+
+        // Add selected flashcards to existing set
+        async function addToExistingSet() {
+            if (selectedFlashcards.size === 0) {
+                showMessage('Please select at least one flashcard', 'error');
+                return;
+            }
+
+            const targetSetId = document.getElementById('targetSetSelect').value;
+            if (!targetSetId) {
+                showMessage('Please select a set first', 'error');
+                return;
+            }
+
+            try {
+                // Check if any selected flashcards are already in other sets
+                const flashcardsInOtherSets = Array.from(selectedFlashcards).filter(id => {
+                    const card = flashcards.find(c => c.id === id);
+                    return card && card.set_id && card.set_id !== 'none' && card.set_id !== targetSetId;
+                });
+
+                if (flashcardsInOtherSets.length > 0) {
+                    const otherSetNames = [...new Set(flashcardsInOtherSets.map(id => {
+                        const card = flashcards.find(c => c.id === id);
+                        return getSetName(card.set_id);
+                    }))];
+
+                    const confirmed = confirm(`${flashcardsInOtherSets.length} flashcard(s) are already in other sets: ${otherSetNames.join(', ')}. They will be moved to "${getSetName(targetSetId)}". Continue?`);
+                    if (!confirmed) return;
+                }
+
+                // Assign selected flashcards to the target set
+                const assignPromises = Array.from(selectedFlashcards).map(id =>
+                    fetch(`${API_BASE}/flashcards/${id}/assign-set`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ set_id: targetSetId })
+                    })
+                );
+
+                await Promise.all(assignPromises);
+
+                // Update set counts and clean up empty sets
+                await updateSetCounts();
+
+                showMessage(`Added ${selectedFlashcards.size} flashcard(s) to "${getSetName(targetSetId)}"!`, 'success');
+                selectedFlashcards.clear();
+                await loadFlashcards();
+
+            } catch (error) {
+                showMessage(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Toggle flag status of a flashcard
+        async function toggleFlag(id) {
+            try {
+                const response = await fetch(`${API_BASE}/flashcards/${id}/toggle-flag`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (response.ok) {
+                    const updatedCard = await response.json();
+                    const card = flashcards.find(c => c.id === id);
+                    if (card) {
+                        card.flagged = updatedCard.flagged;
+                    }
+                    displayFlashcards();
+                    showMessage(`Flashcard ${updatedCard.flagged ? 'flagged' : 'unflagged'} successfully!`, 'success');
+                } else {
+                    throw new Error('Failed to toggle flag');
+                }
+            } catch (error) {
+                showMessage(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Create new set button handler
+        function createNewSet() {
+            if (selectedFlashcards.size === 0) {
+                showMessage('Please select at least one flashcard', 'error');
+                return;
+            }
+            document.getElementById('createSetModal').classList.add('active');
+        }
+
+        // Create new set with selected flashcards
+        async function confirmCreateSet() {
+            const name = document.getElementById('setName').value.trim();
+            if (!name) {
+                showMessage('Please enter a set name', 'error');
+                return;
+            }
+
+            // Check if set name already exists
+            const existingSet = flashcardSets.find(set => set.name.toLowerCase() === name.toLowerCase());
+            if (existingSet) {
+                showMessage('A set with this name already exists. Please choose a different name.', 'error');
+                return;
+            }
+
+            // Check if any selected flashcards are already in sets
+            const flashcardsInSets = Array.from(selectedFlashcards).filter(id => {
+                const card = flashcards.find(c => c.id === id);
+                return card && card.set_id && card.set_id !== 'none';
+            });
+
+            if (flashcardsInSets.length > 0) {
+                const setNames = [...new Set(flashcardsInSets.map(id => {
+                    const card = flashcards.find(c => c.id === id);
+                    return getSetName(card.set_id);
+                }))];
+
+                const confirmed = confirm(`${flashcardsInSets.length} flashcard(s) are already in sets: ${setNames.join(', ')}. They will be moved to the new set "${name}". Continue?`);
+                if (!confirmed) return;
+            }
+
+            try {
+                // Create set
+                const url = new URL(`${API_BASE}/flashcard-sets`);
+                url.searchParams.append('name', name);
+                url.searchParams.append('flashcard_count', selectedFlashcards.size);
+
+                const setResponse = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (!setResponse.ok) {
+                    throw new Error('Failed to create set');
+                }
+
+                const newSet = await setResponse.json();
+
+                // Assign selected flashcards to the new set
+                const assignPromises = Array.from(selectedFlashcards).map(id =>
+                    fetch(`${API_BASE}/flashcards/${id}/assign-set`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ set_id: newSet.id })
+                    })
+                );
+
+                await Promise.all(assignPromises);
+
+                // Update set counts and clean up empty sets
+                await updateSetCounts();
+
+                showMessage(`Created set "${name}" with ${selectedFlashcards.size} flashcard(s)!`, 'success');
+                selectedFlashcards.clear();
+                document.getElementById('setName').value = '';
+                closeCreateSetModal();
+                await loadFlashcards();
+
+            } catch (error) {
+                showMessage(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Modal controls
+        function closeCreateSetModal() {
+            document.getElementById('createSetModal').classList.remove('active');
+        }
+
+        // Edit flashcard
+        function editFlashcard(id) {
+            const card = flashcards.find(c => c.id === id);
+            if (!card) return;
+
+            currentEditId = id;
+            document.getElementById('editFront').value = card.front;
+            document.getElementById('editBack').value = card.back;
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        // Save edit
+        async function saveEdit() {
+            if (!currentEditId) return;
+
+            const front = document.getElementById('editFront').value.trim();
+            const back = document.getElementById('editBack').value.trim();
+
+            if (!front || !back) {
+                showMessage('Both front and back are required', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/flashcards/${currentEditId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ front, back })
+                });
+
+                if (response.ok) {
+                    showMessage('Flashcard updated successfully!', 'success');
+                    closeEditModal();
+                    await loadFlashcards();
+                } else {
+                    const error = await response.json();
+                    showMessage(`Error: ${error.detail}`, 'error');
+                }
+            } catch (error) {
+                showMessage(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Close edit modal
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+            currentEditId = null;
+        }
+
+        // Delete flashcard with proper set cleanup
+        async function deleteFlashcard(id) {
+            if (!confirm('Are you sure you want to delete this flashcard?')) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/flashcards/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showMessage('Flashcard deleted successfully!', 'success');
+                    selectedFlashcards.delete(id);
+                    await loadFlashcards(); // This will trigger set cleanup automatically
+                } else {
+                    const error = await response.json();
+                    showMessage(`Error: ${error.detail}`, 'error');
+                }
+            } catch (error) {
+                showMessage(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Load study options
+        async function loadStudyOptions() {
+            try {
+                // Refresh flashcard sets data
+                const setsRes = await fetch(`${API_BASE}/flashcard-sets`);
+                if (setsRes.ok) {
+                    flashcardSets = await setsRes.json();
+
+                    const checkboxContainer = document.getElementById('studyCheckboxes');
+
+                    // Create "All Flashcards" checkbox first
+                    let checkboxHtml = `
+                        <div style="margin-bottom: 0.5rem;">
+                            <label style="display: flex; align-items: center; cursor: pointer; font-weight: normal;">
+                                <input type="checkbox" id="allFlashcardsCheckbox" value="all" 
+                                       onchange="handleAllFlashcardsChange()" 
+                                       style="margin-right: 0.5rem; width: 18px; height: 18px; accent-color: #667eea;">
+                                All Flashcards
+                            </label>
+                        </div>
+                    `;
+
+                    // Only show sets that have flashcards
+                    const validSets = flashcardSets.filter(set => set.flashcard_count > 0);
+                    validSets.forEach(set => {
+                        checkboxHtml += `
+                            <div style="margin-bottom: 0.5rem;">
+                                <label style="display: flex; align-items: center; cursor: pointer; font-weight: normal;">
+                                    <input type="checkbox" class="setCheckbox" value="${set.id}" 
+                                           onchange="handleSetCheckboxChange()" 
+                                           style="margin-right: 0.5rem; width: 18px; height: 18px; accent-color: #667eea;">
+                                    ${set.name} (${set.flashcard_count} cards)
+                                </label>
+                            </div>
+                        `;
+                    });
+
+                    checkboxContainer.innerHTML = checkboxHtml;
+                }
+            } catch (error) {
+                console.error('Error loading study options:', error);
+            }
+        }
+
+        // Handle "All Flashcards" checkbox change
+        function handleAllFlashcardsChange() {
+            const allCheckbox = document.getElementById('allFlashcardsCheckbox');
+            const setCheckboxes = document.querySelectorAll('.setCheckbox');
+            
+            if (allCheckbox.checked) {
+                // Uncheck all set checkboxes
+                setCheckboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+            }
+        }
+
+        // Handle individual set checkbox changes
+        function handleSetCheckboxChange() {
+            const allCheckbox = document.getElementById('allFlashcardsCheckbox');
+            
+            // If any set checkbox is checked, uncheck "All Flashcards"
+            allCheckbox.checked = false;
+        }
+
+        // Start study session
+        async function startStudy() {
+            try {
+                const allCheckbox = document.getElementById('allFlashcardsCheckbox');
+                const setCheckboxes = document.querySelectorAll('.setCheckbox:checked');
+
+                let selectedValues = [];
+                if (allCheckbox.checked) {
+                    selectedValues = ['all'];
+                } else {
+                    selectedValues = Array.from(setCheckboxes).map(checkbox => checkbox.value);
+                }
+
+                if (selectedValues.length === 0) {
+                    showMessage('Please select at least one study option', 'error');
+                    return;
+                }
+
+                let studyFlashcards = [];
+
+                if (selectedValues.includes('all')) {
+                    // Get all flashcards
+                    const response = await fetch(`${API_BASE}/flashcards`);
+                    if (response.ok) {
+                        studyFlashcards = await response.json();
+                    }
+                } else {
+                    // Get flashcards from selected sets
+                    const allFlashcards = await fetch(`${API_BASE}/flashcards`).then(r => r.json());
+                    studyFlashcards = allFlashcards.filter(card =>
+                        selectedValues.includes(card.set_id)
+                    );
+                }
+
+                if (studyFlashcards.length === 0) {
+                    showMessage('No flashcards found for the selected options', 'error');
+                    return;
+                }
+
+                // Shuffle the flashcards
+                currentStudySet = studyFlashcards.sort(() => Math.random() - 0.5);
+                currentStudyIndex = 0;
+                isFlipped = false;
+                isStudySessionActive = true;
+
+                // Update UI
+                document.getElementById('studyOptionsContainer').style.display = 'none';
+                document.getElementById('studySessionContainer').style.display = 'block';
+
+                displayCurrentCard();
+
+            } catch (error) {
+                showMessage(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Start flagged cards study session
+        async function startFlaggedStudy() {
+            try {
+                const response = await fetch(`${API_BASE}/flashcards/flagged`);
+                if (!response.ok) {
+                    throw new Error('Failed to load flagged flashcards');
+                }
+
+                const flaggedFlashcards = await response.json();
+                
+                if (flaggedFlashcards.length === 0) {
+                    showMessage('No flagged flashcards found', 'error');
+                    return;
+                }
+
+                // Shuffle the flashcards
+                currentStudySet = flaggedFlashcards.sort(() => Math.random() - 0.5);
+                currentStudyIndex = 0;
+                isFlipped = false;
+                isStudySessionActive = true;
+
+                // Update UI
+                document.getElementById('studyOptionsContainer').style.display = 'none';
+                document.getElementById('studySessionContainer').style.display = 'block';
+
+                displayCurrentCard();
+
+            } catch (error) {
+                showMessage(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Display current study card
+        function displayCurrentCard() {
+            if (currentStudySet.length === 0) {
+                document.getElementById('studyContainer').innerHTML =
+                    '<div class="message">No flashcards available for study</div>';
+                return;
+            }
+
+            const card = currentStudySet[currentStudyIndex];
+            const progress = `Card ${currentStudyIndex + 1} of ${currentStudySet.length}`;
+
+            document.getElementById('studyContainer').innerHTML = `
+                <div class="study-card ${isFlipped ? 'flipped' : ''} ${card.flagged ? 'flagged' : ''}" onclick="flipCard()">
+                    <div class="study-info">${progress}</div>
+                    <div class="study-text">
+                        ${isFlipped ? card.back : card.front}
+                    </div>
+                    <div style="color: #999; font-size: 0.9rem; margin-top: 1rem;">
+                        ${isFlipped ? 'Answer' : 'Question'} - Click to ${isFlipped ? 'see question' : 'reveal answer'}
+                    </div>
+                </div>
+                <div class="study-controls">
+                    <button class="btn btn-secondary" onclick="previousCard()" ${currentStudyIndex === 0 ? 'disabled' : ''}>
+                        ← Previous
+                    </button>
+                    <button class="btn btn-flag ${card.flagged ? 'flagged' : ''}" onclick="toggleFlagInStudy()">${card.flagged ? '🚩 Unflag' : '🚩 Flag'}</button>
+                    <button class="btn btn-primary" onclick="nextCard()">
+                        ${currentStudyIndex === currentStudySet.length - 1 ? 'Finish Study' : 'Next →'}
+                    </button>
+                </div>
+            `;
+        }
+
+        // Flip current card
+        function flipCard() {
+            isFlipped = !isFlipped;
+            displayCurrentCard();
+        }
+
+        // Navigate to next card
+        function nextCard() {
+            if (currentStudyIndex >= currentStudySet.length - 1) {
+                // Study session complete
+                finishStudy();
+            } else {
+                currentStudyIndex++;
+                isFlipped = false;
+                displayCurrentCard();
+            }
+        }
+
+        // Navigate to previous card
+        function previousCard() {
+            if (currentStudyIndex > 0) {
+                currentStudyIndex--;
+                isFlipped = false;
+                displayCurrentCard();
+            }
+        }
+
+        // Toggle flag in study mode
+        async function toggleFlagInStudy() {
+            const card = currentStudySet[currentStudyIndex];
+            try {
+                const response = await fetch(`${API_BASE}/flashcards/${card.id}/toggle-flag`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (response.ok) {
+                    const updatedCard = await response.json();
+                    card.flagged = updatedCard.flagged;
+                    displayCurrentCard();
+                } else {
+                    throw new Error('Failed to toggle flag');
+                }
+            } catch (error) {
+                console.error('Error toggling flag:', error);
+            }
+        }
+
+        // Finish study session
+        function finishStudy() {
+            showMessage(`Study session complete! You reviewed ${currentStudySet.length} flashcards.`, 'success');
+            abortStudy();
+        }
+
+        // Abort study session
+        function abortStudy() {
+            isStudySessionActive = false;
+            currentStudySet = [];
+            currentStudyIndex = 0;
+            isFlipped = false;
+
+            // Reset UI
+            document.getElementById('studyOptionsContainer').style.display = 'block';
+            document.getElementById('studySessionContainer').style.display = 'none';
+            document.getElementById('studyContainer').innerHTML =
+                '<div class="loading">Select study mode and click "Start Study Session"</div>';
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function (event) {
+            const editModal = document.getElementById('editModal');
+            const createSetModal = document.getElementById('createSetModal');
+
+            if (event.target === editModal) {
+                closeEditModal();
+            }
+            if (event.target === createSetModal) {
+                closeCreateSetModal();
+            }
+        }
+
+        // Initialize Pomodoro timer
+        function initializePomodoro() {
+            updatePomodoroDisplay();
+            updatePomodoroStats();
+        }
+
+        // Toggle timer start/pause
+        function toggleTimer() {
+            if (pomodoroIsRunning) {
+                pausePomodoro();
+            } else {
+                startPomodoro();
+            }
+        }
+
+        // Start Pomodoro timer
+        function startPomodoro() {
+            pomodoroIsRunning = true;
+            document.getElementById('startPauseBtn').textContent = 'Pause';
+            
+            pomodoroTimer = setInterval(() => {
+                pomodoroTimeLeft--;
+                updatePomodoroDisplay();
+                
+                if (pomodoroTimeLeft <= 0) {
+                    completeSession();
+                }
+            }, 1000);
+        }
+
+        // Pause Pomodoro timer
+        function pausePomodoro() {
+            pomodoroIsRunning = false;
+            document.getElementById('startPauseBtn').textContent = 'Start';
+            clearInterval(pomodoroTimer);
+        }
+
+        // Reset timer
+        function resetTimer() {
+            pausePomodoro();
+            pomodoroTimeLeft = pomodoroSettings[pomodoroPhase];
+            updatePomodoroDisplay();
+        }
+
+        // Skip current session
+        function skipSession() {
+            completeSession();
+        }
+
+        // Complete current session and move to next phase
+        function completeSession() {
+            pausePomodoro();
+            
+            if (pomodoroPhase === 'work') {
+                pomodoroCompletedSessions++;
+                pomodoroTotalFocusTime += pomodoroSettings.work;
+                pomodoroSessionCount++;
+                
+                // Determine next break type
+                if (pomodoroSessionCount % pomodoroSettings.sessionsBeforeLongBreak === 0) {
+                    pomodoroPhase = 'longBreak';
+                } else {
+                    pomodoroPhase = 'shortBreak';
+                }
+            } else {
+                // Break ended, back to work
+                pomodoroPhase = 'work';
+            }
+            
+            pomodoroTimeLeft = pomodoroSettings[pomodoroPhase];
+            updatePomodoroDisplay();
+            updatePomodoroStats();
+            
+            // Show notification
+            const phaseNames = {
+                work: 'Work Session',
+                shortBreak: 'Short Break',
+                longBreak: 'Long Break'
+            };
+            showMessage(`Time for ${phaseNames[pomodoroPhase]}!`, 'success');
+        }
+
+        // Update timer display
+        function updatePomodoroDisplay() {
+            const minutes = Math.floor(pomodoroTimeLeft / 60);
+            const seconds = pomodoroTimeLeft % 60;
+            const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
+            document.getElementById('timerTime').textContent = timeString;
+            
+            // Update phase display
+            const phaseNames = {
+                work: 'Work Session',
+                shortBreak: 'Short Break',
+                longBreak: 'Long Break'
+            };
+            document.getElementById('timerPhase').textContent = phaseNames[pomodoroPhase];
+            
+            // Update progress ring
+            const totalTime = pomodoroSettings[pomodoroPhase];
+            const progress = ((totalTime - pomodoroTimeLeft) / totalTime) * 360;
+            document.getElementById('timerProgress').style.transform = `rotate(${progress - 90}deg)`;
+            
+            // Update colors based on phase
+            const circle = document.getElementById('timerCircle');
+            const progressRing = document.getElementById('timerProgress');
+            
+            if (pomodoroPhase === 'work') {
+                circle.style.borderColor = '#667eea';
+                progressRing.style.borderTopColor = '#764ba2';
+                document.getElementById('timerTime').style.color = '#667eea';
+            } else {
+                circle.style.borderColor = '#28a745';
+                progressRing.style.borderTopColor = '#20c997';
+                document.getElementById('timerTime').style.color = '#28a745';
+            }
+        }
+
+        // Update settings
+        function updateSettings() {
+            if (pomodoroIsRunning) {
+                showMessage('Cannot change settings while timer is running', 'error');
+                return;
+            }
+            
+            pomodoroSettings.work = parseInt(document.getElementById('workDuration').value) * 60;
+            pomodoroSettings.shortBreak = parseInt(document.getElementById('shortBreakDuration').value) * 60;
+            pomodoroSettings.longBreak = parseInt(document.getElementById('longBreakDuration').value) * 60;
+            pomodoroSettings.sessionsBeforeLongBreak = parseInt(document.getElementById('sessionsBeforeLongBreak').value);
+            
+            // Reset current timer with new duration
+            pomodoroTimeLeft = pomodoroSettings[pomodoroPhase];
+            updatePomodoroDisplay();
+        }
+
+        // Update statistics display
+        function updatePomodoroStats() {
+            document.getElementById('completedSessions').textContent = pomodoroCompletedSessions;
+            
+            const hours = Math.floor(pomodoroTotalFocusTime / 3600);
+            const minutes = Math.floor((pomodoroTotalFocusTime % 3600) / 60);
+            document.getElementById('totalFocusTime').textContent = `${hours}:${minutes.toString().padStart(2, '0')}`;
+            
+            document.getElementById('currentStreak').textContent = pomodoroSessionCount;
+        }
+
+        // Handle keyboard shortcuts
+            document.addEventListener('keydown', function (event) {
+                if (isStudySessionActive) {
+                    switch (event.key) {
+                        case ' ':
+                        case 'Enter':
+                            event.preventDefault();
+                            flipCard();
+                            break;
+                        case 'ArrowLeft':
+                            event.preventDefault();
+                            previousCard();
+                            break;
+                        case 'ArrowRight':
+                            event.preventDefault();
+                            nextCard();
+                            break;
+                        case 'Escape':
+                            abortStudy();
+                            break;
+                    }
+                } else if (event.key === 'Escape') {
+                    // Close minesweeper if open
+                    const minesweeperSection = document.getElementById('minesweeper-section');
+                    if (minesweeperSection && minesweeperSection.style.display === 'block') {
+                        hideMinesweeper();
+                    }
+                }
+            });
+        // Minesweeper functions
+        function showMinesweeper() {
+            document.getElementById('minesweeper-section').style.display = 'block';
+            initMinesweeper();
+        }
+
+        function hideMinesweeper() {
+            document.getElementById('minesweeper-section').style.display = 'none';
+            if (minesweeperTimer) {
+                clearInterval(minesweeperTimer);
+                minesweeperTimer = null;
+            }
+            minesweeperGameActive = false;
+        }
+
+        function initMinesweeper() {
+            const difficulty = document.getElementById('difficulty').value;
+            
+            switch (difficulty) {
+                case 'easy':
+                    minesweeperRows = 9; minesweeperCols = 9; minesweeperMines = 10;
+                    break;
+                case 'medium':
+                    minesweeperRows = 16; minesweeperCols = 16; minesweeperMines = 40;
+                    break;
+                case 'hard':
+                    minesweeperRows = 16; minesweeperCols = 30; minesweeperMines = 99;
+                    break;
+            }
+            
+            createMinesweeperGrid();
+            placeMines();
+            calculateNumbers();
+            renderMinesweeperGrid();
+            
+            minesweeperGameActive = true;
+            minesweeperStartTime = null;
+            minesweeperFlagsUsed = 0;
+            
+            document.getElementById('mine-count').textContent = minesweeperMines;
+            document.getElementById('game-time').textContent = '0';
+            document.getElementById('game-status').textContent = 'Click to start!';
+            
+            if (minesweeperTimer) {
+                clearInterval(minesweeperTimer);
+                minesweeperTimer = null;
+            }
+        }
+
+        function createMinesweeperGrid() {
+            minesweeperGrid = [];
+            for (let r = 0; r < minesweeperRows; r++) {
+                minesweeperGrid[r] = [];
+                for (let c = 0; c < minesweeperCols; c++) {
+                    minesweeperGrid[r][c] = {
+                        isMine: false,
+                        isRevealed: false,
+                        isFlagged: false,
+                        neighborMines: 0
+                    };
+                }
+            }
+        }
+
+        function placeMines() {
+            let minesPlaced = 0;
+            while (minesPlaced < minesweeperMines) {
+                const r = Math.floor(Math.random() * minesweeperRows);
+                const c = Math.floor(Math.random() * minesweeperCols);
+                
+                if (!minesweeperGrid[r][c].isMine) {
+                    minesweeperGrid[r][c].isMine = true;
+                    minesPlaced++;
+                }
+            }
+        }
+
+        function calculateNumbers() {
+            for (let r = 0; r < minesweeperRows; r++) {
+                for (let c = 0; c < minesweeperCols; c++) {
+                    if (!minesweeperGrid[r][c].isMine) {
+                        let count = 0;
+                        for (let dr = -1; dr <= 1; dr++) {
+                            for (let dc = -1; dc <= 1; dc++) {
+                                const nr = r + dr;
+                                const nc = c + dc;
+                                if (nr >= 0 && nr < minesweeperRows && nc >= 0 && nc < minesweeperCols) {
+                                    if (minesweeperGrid[nr][nc].isMine) count++;
+                                }
+                            }
+                        }
+                        minesweeperGrid[r][c].neighborMines = count;
+                    }
+                }
+            }
+        }
+
+        function renderMinesweeperGrid() {
+            const container = document.getElementById('minesweeper-grid');
+            container.innerHTML = '';
+            container.style.width = (minesweeperCols * 27) + 'px';
+            
+            for (let r = 0; r < minesweeperRows; r++) {
+                for (let c = 0; c < minesweeperCols; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'mine-cell';
+                    cell.dataset.row = r;
+                    cell.dataset.col = c;
+                    
+                    cell.addEventListener('click', () => revealCell(r, c));
+                    cell.addEventListener('contextmenu', (e) => {
+                        e.preventDefault();
+                        toggleFlag(r, c);
+                    });
+                    
+                    updateCellDisplay(cell, r, c);
+                    container.appendChild(cell);
+                }
+            }
+        }
+
+        function updateCellDisplay(cell, r, c) {
+            const cellData = minesweeperGrid[r][c];
+            
+            cell.className = 'mine-cell';
+            cell.textContent = '';
+            
+            if (cellData.isFlagged) {
+                cell.classList.add('flagged');
+                cell.textContent = '🚩';
+            } else if (cellData.isRevealed) {
+                cell.classList.add('revealed');
+                if (cellData.isMine) {
+                    cell.classList.add('mine');
+                    cell.textContent = '💣';
+                } else if (cellData.neighborMines > 0) {
+                    cell.textContent = cellData.neighborMines;
+                    cell.style.color = getNumberColor(cellData.neighborMines);
+                }
+            }
+        }
+
+        function getNumberColor(num) {
+            const colors = ['', '#0000ff', '#008000', '#ff0000', '#800080', '#800000', '#008080', '#000000', '#808080'];
+            return colors[num] || '#000';
+        }
+
+        function revealCell(r, c) {
+            if (!minesweeperGameActive) return;
+            
+            const cell = minesweeperGrid[r][c];
+            if (cell.isRevealed || cell.isFlagged) return;
+            
+            if (!minesweeperStartTime) {
+                minesweeperStartTime = Date.now();
+                minesweeperTimer = setInterval(updateTimer, 1000);
+            }
+            
+            cell.isRevealed = true;
+            
+            if (cell.isMine) {
+                gameOver(false);
+                return;
+            }
+            
+            if (cell.neighborMines === 0) {
+                for (let dr = -1; dr <= 1; dr++) {
+                    for (let dc = -1; dc <= 1; dc++) {
+                        const nr = r + dr;
+                        const nc = c + dc;
+                        if (nr >= 0 && nr < minesweeperRows && nc >= 0 && nc < minesweeperCols) {
+                            revealCell(nr, nc);
+                        }
+                    }
+                }
+            }
+            
+            renderMinesweeperGrid();
+            checkWin();
+        }
+
+        function toggleFlag(r, c) {
+            if (!minesweeperGameActive) return;
+            
+            const cell = minesweeperGrid[r][c];
+            if (cell.isRevealed) return;
+            
+            if (cell.isFlagged) {
+                cell.isFlagged = false;
+                minesweeperFlagsUsed--;
+            } else {
+                cell.isFlagged = true;
+                minesweeperFlagsUsed++;
+            }
+            
+            document.getElementById('mine-count').textContent = minesweeperMines - minesweeperFlagsUsed;
+            renderMinesweeperGrid();
+        }
+
+        function updateTimer() {
+            if (minesweeperStartTime) {
+                const elapsed = Math.floor((Date.now() - minesweeperStartTime) / 1000);
+                document.getElementById('game-time').textContent = elapsed;
+            }
+        }
+
+        function checkWin() {
+            let revealedCount = 0;
+            for (let r = 0; r < minesweeperRows; r++) {
+                for (let c = 0; c < minesweeperCols; c++) {
+                    if (minesweeperGrid[r][c].isRevealed && !minesweeperGrid[r][c].isMine) {
+                        revealedCount++;
+                    }
+                }
+            }
+            
+            if (revealedCount === (minesweeperRows * minesweeperCols - minesweeperMines)) {
+                gameOver(true);
+            }
+        }
+
+        function gameOver(won) {
+            minesweeperGameActive = false;
+            if (minesweeperTimer) {
+                clearInterval(minesweeperTimer);
+                minesweeperTimer = null;
+            }
+            
+            if (won) {
+                document.getElementById('game-status').textContent = '🎉 You Won!';
+                document.getElementById('game-status').style.color = '#28a745';
+            } else {
+                document.getElementById('game-status').textContent = '💥 Game Over!';
+                document.getElementById('game-status').style.color = '#dc3545';
+                
+                // Reveal all mines
+                for (let r = 0; r < minesweeperRows; r++) {
+                    for (let c = 0; c < minesweeperCols; c++) {
+                        if (minesweeperGrid[r][c].isMine) {
+                            minesweeperGrid[r][c].isRevealed = true;
+                        }
+                    }
+                }
+                renderMinesweeperGrid();
+            }
+        }
+
+    </script>
+    <!-- Minesweeper Styles -->
+    <style>
+        #minesweeper-section {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            overflow: auto;
+        }
+    
+        .minesweeper-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            text-align: center;
+        }
+    
+        .minesweeper-grid {
+            display: inline-block;
+            border: 2px solid #333;
+            margin: 20px 0;
+        }
+    
+        .mine-cell {
+            width: 25px;
+            height: 25px;
+            border: 1px solid #999;
+            background: #ddd;
+            display: inline-block;
+            text-align: center;
+            line-height: 25px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            vertical-align: top;
+        }
+    
+        .mine-cell.revealed {
+            background: #fff;
+        }
+    
+        .mine-cell.flagged {
+            background: #ff6b6b;
+            color: white;
+        }
+    
+        .mine-cell.mine {
+            background: #ff4757;
+        }
+    
+        .minesweeper-controls {
+            margin: 20px 0;
+        }
+    
+        .minesweeper-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+    </style>
+</body>
+
+</html>
